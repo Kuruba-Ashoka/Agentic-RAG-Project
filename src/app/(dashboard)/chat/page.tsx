@@ -633,67 +633,6 @@ export default function ChatPage() {
     loadHistory();
   }, [loadHistory]);
 
-  // Create new conversation
-  const createNew = useCallback(async () => {
-    const res = await fetch("/api/conversations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
-    });
-    const data = await res.json();
-    if (data.conversation?.id) {
-      setConversationId(data.conversation.id);
-      setInitialMessages([]);
-      setChunks([]);
-      setRetrievalLatency(null);
-      loadHistory();
-    }
-  }, [loadHistory]);
-
-  // Load existing conversation
-  const loadConversation = useCallback(async (id: string) => {
-    setConversationId(id);
-    setChunks([]);
-    setRetrievalLatency(null);
-    const res = await fetch(`/api/conversations/${id}`);
-    const data = await res.json();
-    if (data.conversation?.messages) {
-      const msgs = data.conversation.messages.map((m: any) => ({
-        id: m.id,
-        role: m.role === "USER" ? "user" : m.role === "ASSISTANT" ? "assistant" : "system",
-        content: m.content,
-        createdAt: new Date(m.createdAt),
-      }));
-      setInitialMessages(msgs);
-      const lastAssistant = [...data.conversation.messages].reverse()
-        .find((m: any) => m.role === "ASSISTANT" && m.citations);
-      if (lastAssistant?.citations) {
-        try {
-          const parsed = typeof lastAssistant.citations === "string"
-            ? JSON.parse(lastAssistant.citations)
-            : lastAssistant.citations;
-          if (Array.isArray(parsed)) {
-            setChunks(parsed.slice(0, 5));
-          }
-        } catch {}
-      }
-    }
-  }, []);
-
-  // Delete conversation
-  const deleteConv = useCallback(async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!window.confirm("Delete this conversation?")) return;
-    await fetch(`/api/conversations/${id}`, { method: "DELETE" });
-    if (conversationId === id) {
-      setConversationId(null);
-      setInitialMessages([]);
-      setChunks([]);
-      setRetrievalLatency(null);
-    }
-    loadHistory();
-  }, [conversationId, loadHistory]);
-
   // useChat hook
   const { messages, setMessages, sendMessage, regenerate, status, error } = useChat({
     initialMessages,
@@ -720,6 +659,70 @@ export default function ChatPage() {
       loadHistory();
     },
   } as any);
+
+  // Create new conversation
+  const createNew = useCallback(async () => {
+    const res = await fetch("/api/conversations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    const data = await res.json();
+    if (data.conversation?.id) {
+      setConversationId(data.conversation.id);
+      setInitialMessages([]);
+      setMessages([]);
+      setChunks([]);
+      setRetrievalLatency(null);
+      loadHistory();
+    }
+  }, [loadHistory, setMessages]);
+
+  // Load existing conversation
+  const loadConversation = useCallback(async (id: string) => {
+    setConversationId(id);
+    setChunks([]);
+    setRetrievalLatency(null);
+    const res = await fetch(`/api/conversations/${id}`);
+    const data = await res.json();
+    if (data.conversation?.messages) {
+      const msgs = data.conversation.messages.map((m: any) => ({
+        id: m.id,
+        role: m.role === "USER" ? "user" : m.role === "ASSISTANT" ? "assistant" : "system",
+        content: m.content,
+        createdAt: new Date(m.createdAt),
+      }));
+      setInitialMessages(msgs);
+      setMessages(msgs);
+      const lastAssistant = [...data.conversation.messages].reverse()
+        .find((m: any) => m.role === "ASSISTANT" && m.citations);
+      if (lastAssistant?.citations) {
+        try {
+          const parsed = typeof lastAssistant.citations === "string"
+            ? JSON.parse(lastAssistant.citations)
+            : lastAssistant.citations;
+          if (Array.isArray(parsed)) {
+            setChunks(parsed.slice(0, 5));
+          }
+        } catch {}
+      }
+    }
+  }, [setMessages]);
+
+  // Delete conversation
+  const deleteConv = useCallback(async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!window.confirm("Delete this conversation?")) return;
+    await fetch(`/api/conversations/${id}`, { method: "DELETE" });
+    if (conversationId === id) {
+      setConversationId(null);
+      setInitialMessages([]);
+      setMessages([]);
+      setChunks([]);
+      setRetrievalLatency(null);
+    }
+    loadHistory();
+  }, [conversationId, loadHistory, setMessages]);
 
   const isLoading = status === "submitted" || status === "streaming";
 

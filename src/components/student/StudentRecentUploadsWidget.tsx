@@ -142,7 +142,7 @@ export function StudentRecentUploadsWidget() {
   const [error, setError] = useState<string | null>(null);
 
   // Filter & Layout States
-  const [timeframe, setTimeframe] = useState<"today" | "48h" | "7d" | "30d" | "all">("7d");
+  const [timeframe, setTimeframe] = useState<"today" | "48h" | "7d" | "30d" | "all">("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
   const [enrolledOnly, setEnrolledOnly] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");

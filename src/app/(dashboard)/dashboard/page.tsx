@@ -83,7 +83,7 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Interactive UI States
-  const [noticeCategory, setNoticeCategory] = useState<"all" | "academic" | "exams" | "library">("all");
+  const [noticeCategory, setNoticeCategory] = useState<"all" | "academic" | "library">("all");
   const [copied, setCopied] = useState(false);
 
   // Interactive Study Focus Timer (Pomodoro Widget)
@@ -316,7 +316,7 @@ export default function DashboardPage() {
           <div className="mt-6 pt-5 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
             <div className="p-3 rounded-2xl bg-slate-800/40 border border-slate-700/40">
               <span className="text-[10px] font-bold text-indigo-300 uppercase tracking-wider block">Department Files</span>
-              <span className="text-lg font-black text-white mt-0.5 block">{recentDocs.length} Materials</span>
+              <span className="text-lg font-black text-white mt-0.5 block">{data?.academicContext?.authorizedDocsCount || recentDocs.length} Materials</span>
               <span className="text-[10px] text-slate-400">Published by {deptCode} faculty</span>
             </div>
 
@@ -350,7 +350,7 @@ export default function DashboardPage() {
 
               {/* Interactive Category Filter Pills */}
               <div className="flex items-center gap-1 bg-slate-100/80 p-1 rounded-xl">
-                {(["all", "academic", "exams", "library"] as const).map((cat) => (
+                {(["all", "academic", "library"] as const).map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setNoticeCategory(cat)}
@@ -372,15 +372,15 @@ export default function DashboardPage() {
                 <div className="group p-4 rounded-2xl bg-gradient-to-br from-slate-50 to-indigo-50/20 border border-slate-200 hover:border-indigo-300 transition-all duration-300 hover:shadow-md space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 bg-indigo-100/70 px-2 py-0.5 rounded-full">
-                      Regulation
+                      AI Guidance
                     </span>
-                    <span className="text-[10px] text-slate-400 font-medium">Policy 2026</span>
+                    <span className="text-[10px] text-slate-400 font-medium">Interactive Copilot</span>
                   </div>
                   <h3 className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
-                    75% Mandatory Attendance Rule
+                    Ask AI with Document Grounding
                   </h3>
                   <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                    Students must maintain a minimum of 75% overall lecture attendance. Medical condonations between 65%-74% require formal verification by the HOD.
+                    NexusIQ provides verified answers strictly cited from your textbooks, lecture slides, and curriculum documents. Click &quot;Ask AI&quot; on any note to begin.
                   </p>
                 </div>
               )}
@@ -402,19 +402,19 @@ export default function DashboardPage() {
                 </div>
               )}
 
-              {(noticeCategory === "all" || noticeCategory === "exams") && (
+              {(noticeCategory === "all" || noticeCategory === "academic") && (
                 <div className="group p-4 rounded-2xl bg-gradient-to-br from-slate-50 to-purple-50/20 border border-slate-200 hover:border-purple-300 transition-all duration-300 hover:shadow-md space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 bg-purple-100/70 px-2 py-0.5 rounded-full">
-                      Exams
+                      Repository
                     </span>
-                    <span className="text-[10px] text-slate-400 font-medium">Continuous Eval</span>
+                    <span className="text-[10px] text-slate-400 font-medium">Course Clearance</span>
                   </div>
                   <h3 className="text-sm font-bold text-slate-900 group-hover:text-purple-700 transition-colors">
-                    Mid-Term Syllabus Coverage
+                    Verified Department Resources
                   </h3>
                   <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                    Internal assessments follow autonomous unit guidelines. Download the syllabus copy from the materials section to review credit weightage.
+                    Course sections, lab instructions, and unit handouts are automatically verified with faculty attribution and authorized department access.
                   </p>
                 </div>
               )}

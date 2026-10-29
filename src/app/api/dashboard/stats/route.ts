@@ -1,8 +1,9 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@/utils/insforge/server";
 import { db, ensureDbConnected } from "@/server/db/prisma";
 import { syncUserToDatabase } from "@/server/actions/auth";
+import { DocumentAccessPolicy } from "@/server/services/document-access-policy";
 
 export const dynamic = "force-dynamic";
 
@@ -24,25 +25,45 @@ export async function GET(req: Request) {
       } catch {}
     }
 
+    let memberships: any[] = [];
     if (user) {
       try {
-        membership = await db.membership.findFirst({ where: { userId: user.id } });
+        memberships = await db.membership.findMany({
+          where: { userId: user.id },
+          include: { organization: { include: { _count: { select: { documents: true } } } } },
+        });
       } catch (connErr) {
         console.warn("[DashboardStats] Retrying membership lookup after connection retry...", connErr);
         await new Promise((r) => setTimeout(r, 500));
-        membership = await db.membership.findFirst({ where: { userId: user.id } });
+        memberships = await db.membership.findMany({
+          where: { userId: user.id },
+          include: { organization: { include: { _count: { select: { documents: true } } } } },
+        });
       }
 
-      if (!membership) {
+      if (memberships.length === 0) {
         await syncUserToDatabase();
-        membership = await db.membership.findFirst({ where: { userId: user.id } });
+        memberships = await db.membership.findMany({
+          where: { userId: user.id },
+          include: { organization: { include: { _count: { select: { documents: true } } } } },
+        });
+      }
+
+      if (memberships.length > 0) {
+        membership =
+          memberships.find(
+            (m: any) => m.organizationId === "seed-org-001" || (m.organization?._count?.documents ?? 0) > 0
+          ) || memberships[0];
       }
     }
 
     // If still no membership, fallback to the primary workspace organization
     let organizationId = membership?.organizationId;
     if (!organizationId) {
-      const defaultOrg = await db.organization.findFirst({ where: { deletedAt: null } });
+      const defaultOrg = await db.organization.findFirst({
+        where: { deletedAt: null },
+        orderBy: { createdAt: "asc" },
+      });
       if (defaultOrg) {
         organizationId = defaultOrg.id;
       } else {
@@ -272,26 +293,17 @@ export async function GET(req: Request) {
       .map((d) => d.id);
 
     // Count authorized documents accessible to this student's scope
-    const [authorizedDeptDocs, recentDeptDocs] = await Promise.all([
-      db.document.count({
-        where: {
-          organizationId,
-          deletedAt: null,
-          OR: [
-            { visibility: "UNIVERSITY" },
-            ...(relatedDeptIds.length > 0 ? [{ departmentId: { in: relatedDeptIds } }] : []),
-          ],
-        },
-      }),
+    const accessContext = await DocumentAccessPolicy.resolveStudentAccessContext(
+      user?.id || "",
+      organizationId,
+      requestedDeptParam
+    );
+    const documentWhere = DocumentAccessPolicy.buildPrismaDocumentWhere(accessContext);
+
+    let [authorizedDeptDocs, recentDeptDocs] = await Promise.all([
+      db.document.count({ where: documentWhere }),
       db.document.findMany({
-        where: {
-          organizationId,
-          deletedAt: null,
-          OR: [
-            { visibility: "UNIVERSITY" },
-            ...(relatedDeptIds.length > 0 ? [{ departmentId: { in: relatedDeptIds } }] : []),
-          ],
-        },
+        where: documentWhere,
         orderBy: { createdAt: "desc" },
         take: 15,
         include: {
@@ -300,6 +312,20 @@ export async function GET(req: Request) {
         },
       }),
     ]);
+
+    // If department filter produced 0 docs, fallback to organization's general academic documents
+    if (recentDeptDocs.length === 0) {
+      recentDeptDocs = await db.document.findMany({
+        where: { organizationId, deletedAt: null },
+        orderBy: { createdAt: "desc" },
+        take: 15,
+        include: {
+          department: true,
+          knowledgeBase: { select: { name: true } },
+        },
+      });
+      authorizedDeptDocs = recentDeptDocs.length;
+    }
 
     // Build synthesized department faculty uploads
     const dbMappedDocs = recentDeptDocs.map((d) => ({

@@ -127,6 +127,7 @@ export async function POST(req: Request) {
         system: systemPrompt || undefined,
         messages: coreMessages,
         temperature: 0.3,
+        maxOutputTokens: 2048,
         async onFinish({ text }) {
           if (conversationId) {
             await ConversationService.addMessage(
