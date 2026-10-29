@@ -343,36 +343,42 @@ export function CopilotStructuredArtifact({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                      <td className="p-2.5 font-mono font-bold text-slate-900 dark:text-white">22CS101</td>
-                      <td className="p-2.5 font-medium">Aarav Sharma</td>
-                      <td className="p-2.5 text-center font-bold text-rose-600">68.5%</td>
-                      <td className="p-2.5 text-center font-bold text-amber-600">42.0%</td>
-                      <td className="p-2.5">
-                        <Badge className="bg-rose-100 text-rose-800 border-rose-300 text-[10px]">Critical Alert</Badge>
-                      </td>
-                      <td className="p-2.5 text-slate-600 dark:text-slate-400">Low Attendance & Midterm Deficit</td>
-                    </tr>
-                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                      <td className="p-2.5 font-mono font-bold text-slate-900 dark:text-white">22CS103</td>
-                      <td className="p-2.5 font-medium">Chetan Verma</td>
-                      <td className="p-2.5 text-center font-bold text-rose-600">62.0%</td>
-                      <td className="p-2.5 text-center font-bold text-slate-700">58.0%</td>
-                      <td className="p-2.5">
-                        <Badge className="bg-rose-100 text-rose-800 border-rose-300 text-[10px]">Critical Alert</Badge>
-                      </td>
-                      <td className="p-2.5 text-slate-600 dark:text-slate-400">Condonation Threshold Breach (&lt;65%)</td>
-                    </tr>
-                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                      <td className="p-2.5 font-mono font-bold text-slate-900 dark:text-white">22CS105</td>
-                      <td className="p-2.5 font-medium">Eshan Reddy</td>
-                      <td className="p-2.5 text-center font-bold text-amber-600">71.0%</td>
-                      <td className="p-2.5 text-center font-bold text-rose-600">38.0%</td>
-                      <td className="p-2.5">
-                        <Badge className="bg-amber-100 text-amber-800 border-amber-300 text-[10px]">Academic Watch</Badge>
-                      </td>
-                      <td className="p-2.5 text-slate-600 dark:text-slate-400">Internal Marks Below 40% Pass Cutoff</td>
-                    </tr>
+                    {data.students && data.students.length > 0 ? (
+                      data.students.map((s: any, idx: number) => (
+                        <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                          <td className="p-2.5 font-mono font-bold text-slate-900 dark:text-white">
+                            {s.rollNo || s.studentId || `STU-${idx + 1}`}
+                          </td>
+                          <td className="p-2.5 font-medium">{s.name || s.studentName}</td>
+                          <td className="p-2.5 text-center font-bold text-rose-600">
+                            {Number(s.attendancePct || 0).toFixed(1)}%
+                          </td>
+                          <td className="p-2.5 text-center font-bold text-amber-600">
+                            {Number(s.internalMarksPct || s.internalScorePct || 0).toFixed(1)}%
+                          </td>
+                          <td className="p-2.5">
+                            <Badge
+                              className={`text-[10px] ${
+                                s.riskTier === "CRITICAL_RISK"
+                                  ? "bg-rose-100 text-rose-800 border-rose-300"
+                                  : "bg-amber-100 text-amber-800 border-amber-300"
+                              }`}
+                            >
+                              {s.riskTier || "Academic Watch"}
+                            </Badge>
+                          </td>
+                          <td className="p-2.5 text-slate-600 dark:text-slate-400">
+                            {s.shortfallReason || "Attendance / CIE Review Required"}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={6} className="p-4 text-center text-slate-500 italic">
+                          No students currently flagged below the cutoff threshold.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -528,30 +534,51 @@ export function CopilotStructuredArtifact({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 bg-rose-50/30">
-                    <td className="p-2.5 font-bold text-slate-900 dark:text-white">Dr. K. Ramanathan</td>
-                    <td className="p-2.5">Professor</td>
-                    <td className="p-2.5 text-center font-bold text-rose-600">18.0 hrs</td>
-                    <td className="p-2.5 text-center font-mono">16.0 hrs</td>
-                    <td className="p-2.5"><Badge className="bg-rose-100 text-rose-800 border-rose-300 text-[10px]">Overloaded (+2.0h)</Badge></td>
-                    <td className="p-2.5 text-slate-600">Reassign CSE201 Lab section to Teaching Assistant</td>
-                  </tr>
-                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <td className="p-2.5 font-bold text-slate-900 dark:text-white">Dr. S. Ananya</td>
-                    <td className="p-2.5">Associate Professor</td>
-                    <td className="p-2.5 text-center font-bold text-emerald-600">14.0 hrs</td>
-                    <td className="p-2.5 text-center font-mono">16.0 hrs</td>
-                    <td className="p-2.5"><Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px]">Balanced</Badge></td>
-                    <td className="p-2.5 text-slate-600">Optimal teaching & research equilibrium</td>
-                  </tr>
-                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <td className="p-2.5 font-bold text-slate-900 dark:text-white">Prof. M. Sneha</td>
-                    <td className="p-2.5">Assistant Professor</td>
-                    <td className="p-2.5 text-center font-bold text-amber-600">11.0 hrs</td>
-                    <td className="p-2.5 text-center font-mono">18.0 hrs</td>
-                    <td className="p-2.5"><Badge className="bg-amber-100 text-amber-800 border-amber-300 text-[10px]">Underloaded (-5.0h)</Badge></td>
-                    <td className="p-2.5 text-slate-600">Allocate 1 section of Advanced Database Systems</td>
-                  </tr>
+                  {data.faculty && data.faculty.length > 0 ? (
+                    data.faculty.map((f: any, idx: number) => (
+                      <tr
+                        key={idx}
+                        className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 ${
+                          f.isOverloaded ? "bg-rose-50/30" : ""
+                        }`}
+                      >
+                        <td className="p-2.5 font-bold text-slate-900 dark:text-white">{f.name}</td>
+                        <td className="p-2.5">{f.designation || f.rank}</td>
+                        <td
+                          className={`p-2.5 text-center font-bold ${
+                            f.isOverloaded ? "text-rose-600" : "text-emerald-600"
+                          }`}
+                        >
+                          {Number(f.totalHours || 0).toFixed(1)} hrs
+                        </td>
+                        <td className="p-2.5 text-center font-mono">
+                          {Number(f.aicteLimitHours || 16).toFixed(1)} hrs
+                        </td>
+                        <td className="p-2.5">
+                          <Badge
+                            className={`text-[10px] ${
+                              f.isOverloaded
+                                ? "bg-rose-100 text-rose-800 border-rose-300"
+                                : "bg-emerald-100 text-emerald-800 border-emerald-300"
+                            }`}
+                          >
+                            {f.status || (f.isOverloaded ? "Overloaded" : "Compliant")}
+                          </Badge>
+                        </td>
+                        <td className="p-2.5 text-slate-600 dark:text-slate-400">
+                          {Array.isArray(f.assignedCourses)
+                            ? f.assignedCourses.slice(0, 2).join(", ")
+                            : f.statusMessage || "AICTE Compliant Load"}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={6} className="p-4 text-center text-slate-500 italic">
+                        Workload allocation compliant with AICTE norms.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -630,7 +657,7 @@ export function CopilotStructuredArtifact({
                     Corporate Recruitment Intelligence
                   </span>
                   <span className="text-[9px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">
-                    Simulation / Demo
+                    Live Campus Recruitment Drive
                   </span>
                 </div>
                 <h4 className="text-sm font-black text-slate-900 dark:text-white mt-0.5">
@@ -694,29 +721,35 @@ export function CopilotStructuredArtifact({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                    {(data.candidates || [
-                      { rank: 1, studentId: "22AD115", name: "Gayathri Pillai", cgpa: 9.10, skills: ["Python", "AWS", "Distributed Systems", "SQL"], matchPercentage: 98 },
-                      { rank: 2, studentId: "22CS101", name: "Aditya Nair", cgpa: 8.85, skills: ["Python", "AWS", "SQL", "Docker"], matchPercentage: 94 },
-                      { rank: 3, studentId: "22CS104", name: "Bhavana Iyer", cgpa: 7.80, skills: ["Java", "Spring Boot", "SQL"], matchPercentage: 82 },
-                    ]).map((c: any, ci: number) => (
-                      <tr key={ci} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                        <td className="p-2.5 font-bold text-emerald-600">#{c.rank || ci + 1}</td>
-                        <td className="p-2.5 font-mono font-bold">{c.studentId}</td>
-                        <td className="p-2.5 font-medium">{c.name}</td>
-                        <td className="p-2.5 text-center font-bold text-emerald-600">{Number(c.cgpa).toFixed(2)}</td>
-                        <td className="p-2.5 text-[11px] text-slate-600 dark:text-slate-400">
-                          {Array.isArray(c.skills) ? c.skills.join(", ") : c.skills}
-                        </td>
-                        <td className="p-2.5 text-center font-bold text-emerald-600">
-                          {c.matchPercentage || 90}%
-                        </td>
-                        <td className="p-2.5">
-                          <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 text-[10px]">
-                            Shortlisted
-                          </Badge>
+                    {data.candidates && data.candidates.length > 0 ? (
+                      data.candidates.map((c: any, ci: number) => (
+                        <tr key={ci} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                          <td className="p-2.5 font-bold text-emerald-600">#{c.rank || ci + 1}</td>
+                          <td className="p-2.5 font-mono font-bold">{c.studentId}</td>
+                          <td className="p-2.5 font-medium">{c.name}</td>
+                          <td className="p-2.5 text-center font-bold text-emerald-600">
+                            {Number(c.cgpa).toFixed(2)}
+                          </td>
+                          <td className="p-2.5 text-[11px] text-slate-600 dark:text-slate-400">
+                            {Array.isArray(c.skills) ? c.skills.join(", ") : c.skills}
+                          </td>
+                          <td className="p-2.5 text-center font-bold text-emerald-600">
+                            {c.matchPercentage || 90}%
+                          </td>
+                          <td className="p-2.5">
+                            <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 text-[10px]">
+                              Shortlisted
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={7} className="p-4 text-center text-slate-500 italic">
+                          No candidates found matching the criteria.
                         </td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -724,7 +757,7 @@ export function CopilotStructuredArtifact({
 
             {/* Provenance Footer */}
             <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between text-[10px] text-slate-500 gap-1.5">
-              <span>Data Source: <strong>Demo University Dataset</strong> • ID: <code>deterministic-demo-v1</code></span>
+              <span>Data Source: <strong>PostgreSQL SIS & Placement Engine</strong> • ID: <code>live-tpo-v1</code></span>
               <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">✓ Deterministic Verification Invariants Passed</span>
             </div>
           </div>
@@ -790,7 +823,7 @@ export function CopilotStructuredArtifact({
 
             {/* Provenance Footer */}
             <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between text-[10px] text-slate-500 gap-1.5">
-              <span>Data Source: <strong>ALITS Academic SIS Simulation</strong> • ID: <code>academic-demo-v1</code></span>
+              <span>Data Source: <strong>PostgreSQL Academic SIS</strong> • ID: <code>live-sis-v1</code></span>
               <span className="font-mono text-purple-600 dark:text-purple-400 font-bold">✓ Deterministic Schedule Grounding Verified</span>
             </div>
           </div>

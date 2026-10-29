@@ -1,5 +1,15 @@
 import { UniversityDataSource } from "@/server/data-source/university-data-source";
-import { ProvenanceItem } from "@/ai/decision/examination-decision-engine";
+export interface ProvenanceItem {
+  type: "DATABASE_FACT" | "DOCUMENT_FACT" | "DERIVED_DECISION" | "RECOMMENDATION";
+  statement: string;
+  source: string;
+  qualityMetadata?: {
+    source: string;
+    recordValidated: boolean;
+    datasetVersion?: string;
+    freshness?: string;
+  };
+}
 
 export interface CourseAcademicRiskMetric {
   courseId: string;

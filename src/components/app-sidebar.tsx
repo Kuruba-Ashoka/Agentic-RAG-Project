@@ -66,17 +66,6 @@ const navSections: NavSection[] = [
       { title: "AI Academic Copilot", url: "/chat", icon: MessageSquare },
       { title: "Course Notes & Syllabi", url: "/documents", icon: BookOpen },
       { title: "Knowledge Bases", url: "/knowledge-bases", icon: FileText },
-      { title: "Student Profile", url: "/student/profile", icon: Users },
-    ],
-  },
-  {
-    label: "Career & Placement Hub",
-    items: [
-      { title: "Placement Portal", url: "/placement", icon: Briefcase },
-      { title: "Active Campus Drives", url: "/placement?tab=drives", icon: Building2 },
-      { title: "Resume ATS Match", url: "/placement?tab=ats", icon: FileText },
-      { title: "Technical Mock Viva", url: "/placement?tab=mock-interview", icon: Award },
-      { title: "Skills Radar & Roadmap", url: "/skills", icon: Zap },
     ],
   },
   {
@@ -158,7 +147,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter className="border-t border-border p-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Log out" onClick={handleSignOut} className="rounded-md text-muted-foreground hover:text-foreground">
+            <SidebarMenuButton
+              suppressHydrationWarning
+              tooltip="Log out"
+              onClick={handleSignOut}
+              className="rounded-md text-muted-foreground hover:text-foreground"
+            >
               <LogOut className="text-foreground/70" />
               <span>Log out</span>
             </SidebarMenuButton>

@@ -11,18 +11,18 @@ export class UniversityDataSourceFactory {
       return this.instance;
     }
 
-    const mode = (process.env.UNIVERSITY_DATA_SOURCE || "demo").toLowerCase();
+    const mode = (process.env.UNIVERSITY_DATA_SOURCE || "postgres").toLowerCase();
 
     switch (mode) {
-      case "postgres":
-        this.instance = new PostgresDataSource();
+      case "demo":
+        this.instance = new DemoDataSource();
         break;
       case "api":
         this.instance = new ApiDataSource();
         break;
-      case "demo":
+      case "postgres":
       default:
-        this.instance = new DemoDataSource();
+        this.instance = new PostgresDataSource();
         break;
     }
 

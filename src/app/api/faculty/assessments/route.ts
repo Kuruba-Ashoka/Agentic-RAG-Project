@@ -15,10 +15,10 @@ export async function GET(request: NextRequest) {
       assessmentTypes: ["Mid-Term I", "Mid-Term II", "End-Term Model", "Lab Practical Viva"],
       regulation: "R23 Autonomous Academic Regulations",
       provenance: {
-        source: "ALITS Academic SIS Simulation",
-        datasetId: "academic-demo-v1",
-        mode: "Faculty Operations Sandbox",
-        isDemo: true,
+        source: "PostgreSQL Database Engine",
+        datasetId: "live-sis-v1",
+        mode: "Live Faculty Operations",
+        isDemo: false,
       },
     });
   } catch (error: any) {

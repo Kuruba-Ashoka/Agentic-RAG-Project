@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@/utils/insforge/server";
 import { db, ensureDbConnected } from "@/server/db/prisma";
@@ -296,6 +296,7 @@ export async function GET(req: Request) {
         take: 15,
         include: {
           department: true,
+          knowledgeBase: { select: { name: true } },
         },
       }),
     ]);
@@ -304,13 +305,13 @@ export async function GET(req: Request) {
     const dbMappedDocs = recentDeptDocs.map((d) => ({
       id: d.id,
       fileName: d.fileName,
-      courseCode: d.fileName.split("_")[0] || "ACAD",
+      courseCode: d.knowledgeBase?.name ?? null,
       visibility: d.visibility,
-      departmentCode: d.department?.code || (d.visibility === "UNIVERSITY" ? "UNIV" : deptCodeKey),
-      departmentName: d.department?.name || (d.visibility === "UNIVERSITY" ? "University-Wide" : (activeDepartment?.name || "Department")),
-      facultyAuthor: "Prof. Faculty Member",
-      facultyTitle: "Department Faculty Instructor",
-      fileSizeText: `${((d.fileSize || 2048576) / (1024 * 1024)).toFixed(1)} MB`,
+      departmentCode: d.department?.code ?? (d.visibility === "UNIVERSITY" ? "UNIV" : null),
+      departmentName: d.department?.name ?? (d.visibility === "UNIVERSITY" ? "University-Wide" : null),
+      facultyAuthor: d.uploadedBy ?? null,
+      facultyTitle: null,
+      fileSizeText: d.fileSize > 0 ? `${(d.fileSize / (1024 * 1024)).toFixed(1)} MB` : null,
       processingStatus: d.processingStatus,
       createdAt: d.createdAt.toISOString(),
     }));
@@ -334,14 +335,14 @@ export async function GET(req: Request) {
         isStudent: Boolean(studentRecord),
         isFaculty: Boolean(facultyRecord),
         role: studentRecord ? "STUDENT" : facultyRecord ? "FACULTY" : (membership?.role || "MEMBER"),
-        studentNumber: studentRecord?.studentNumber || "STU-CS-101",
-        major: studentRecord?.major || activeDepartment?.name || "Computer Science",
-        gpa: studentRecord?.gpa || 3.8,
-        academicStatus: studentRecord?.academicStatus || "Good Standing",
-        enrolledCoursesCount: studentRecord?._count?.enrolments || 5,
+        studentNumber: studentRecord?.studentNumber ?? null,
+        major: studentRecord?.major ?? null,
+        gpa: studentRecord?.gpa ?? null,
+        academicStatus: studentRecord?.academicStatus ?? null,
+        enrolledCoursesCount: studentRecord?._count?.enrolments ?? 0,
         departmentId: activeDepartment?.id || null,
-        departmentCode: activeDepartment?.code || "CSE",
-        departmentName: activeDepartment?.name || "Computer Science & Engineering",
+        departmentCode: activeDepartment?.code ?? null,
+        departmentName: activeDepartment?.name ?? null,
         authorizedDocsCount: authorizedDeptDocs > 0 ? authorizedDeptDocs : dbMappedDocs.length,
         recentDepartmentDocs: dbMappedDocs,
       },
@@ -376,17 +377,17 @@ export async function GET(req: Request) {
         authorizedDeptDocs: 0,
       },
       academicContext: {
-        isStudent: true,
+        isStudent: false,
         isFaculty: false,
-        role: "STUDENT",
-        studentNumber: "STU-CS-101",
-        major: "Computer Science",
-        gpa: 3.8,
-        academicStatus: "Good Standing",
-        enrolledCoursesCount: 5,
+        role: "MEMBER",
+        studentNumber: null,
+        major: null,
+        gpa: null,
+        academicStatus: null,
+        enrolledCoursesCount: 0,
         departmentId: null,
-        departmentCode: "CSE",
-        departmentName: "Computer Science & Engineering",
+        departmentCode: null,
+        departmentName: null,
         authorizedDocsCount: 0,
         recentDepartmentDocs: [],
       },
@@ -398,3 +399,4 @@ export async function GET(req: Request) {
     });
   }
 }
+

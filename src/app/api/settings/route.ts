@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
     let idNumber = studentRecord?.studentNumber || facultyRecord?.facultyCode || "STU-2026-CSE-104";
     let majorOrDesignation = studentRecord?.major || facultyRecord?.designation || "Computer Science & Engineering";
     let gpa = studentRecord?.gpa || 3.85;
-    let academicStatus = studentRecord?.academicStatus || "Good Standing";
+    let academicStatus = studentRecord?.academicStatus ?? null;
 
     if (facultyRecord) {
       role = facultyRecord.designation === "HOD" ? "HOD" : "FACULTY";

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { db } from "@/server/db/prisma";
-import { WorkloadEngine } from "@/ai/faculty/workload-engine";
 import { AuditService } from "@/server/services/audit.service";
 import crypto from "crypto";
 
@@ -34,18 +33,16 @@ export async function GET(request: Request) {
       const isLead = fac.facultyCode === "FAC-CS-001";
       const teachingHours = fac.timetableEntries.length > 0 ? fac.timetableEntries.length * 3 : (isLead ? 18 : 12);
       const enrolledStudents = fac.sections.reduce((acc, s) => acc + (s.capacity || 30), 0) || (isLead ? 186 : 90);
-      const invigilationDuties = isLead ? 6 : 2;
 
-      const workload = WorkloadEngine.calculateWorkload({
+      const workload = {
         facultyId: fac.id,
         facultyName: fac.user?.name || fac.facultyCode || "Faculty",
         departmentCode: fac.department?.code || departmentCode,
         teachingHours,
         enrolledStudents,
-        invigilationDuties,
-        researchProjects: 1,
-        administrativeRoles: isLead ? 2 : 1,
-      });
+        totalScore: teachingHours * 2,
+        status: teachingHours > 18 ? "OVERLOADED" : "OPTIMAL",
+      };
 
       return {
         id: fac.id,

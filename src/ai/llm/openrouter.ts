@@ -13,6 +13,7 @@ if (!process.env.OPENAI_API_KEY && apiKey) {
 export const llm = new ChatOpenAI({
   model: ModelConfig.reasoning,
   temperature: 0.3,
+  maxTokens: 2048,
   openAIApiKey: apiKey,
   apiKey: apiKey,
   configuration: {

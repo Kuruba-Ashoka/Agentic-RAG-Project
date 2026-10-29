@@ -48,6 +48,57 @@ export async function GET(
       return NextResponse.json({ error: "Document not found" }, { status: 404 });
     }
 
+    // Enforce DocumentAccessPolicy authorization before allowing download
+    const { DocumentAccessPolicy } = await import("@/server/services/document-access-policy");
+    let accessContext: any;
+    if (isFaculty && facultyCookie?.value) {
+      const facultyParsed = JSON.parse(facultyCookie.value);
+      accessContext = {
+        organizationId: facultyParsed.organizationId || doc.organizationId,
+        userId: facultyParsed.userId || facultyParsed.id,
+        facultyId: facultyParsed.id,
+        userRole: (facultyParsed.role || "FACULTY").toUpperCase(),
+        departmentId: facultyParsed.departmentId,
+        collegeId: facultyParsed.collegeId,
+      };
+    } else if (user) {
+      const membership = await db.membership.findFirst({
+        where: { userId: user.id, organizationId: doc.organizationId, deletedAt: null },
+        select: { role: true },
+      });
+      const role = (membership?.role || "STUDENT").toUpperCase();
+
+      if (["OWNER", "ADMIN", "DEAN"].includes(role)) {
+        accessContext = {
+          organizationId: doc.organizationId,
+          userId: user.id,
+          userRole: role,
+        };
+      } else {
+        accessContext = await DocumentAccessPolicy.resolveStudentAccessContext(
+          user.id,
+          doc.organizationId
+        );
+      }
+    } else {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const hasAccess = DocumentAccessPolicy.canAccessDocument(accessContext, {
+      organizationId: doc.organizationId,
+      collegeId: doc.collegeId,
+      departmentId: doc.departmentId,
+      visibility: doc.visibility,
+      uploadedBy: doc.uploadedBy,
+    });
+
+    if (!hasAccess) {
+      return NextResponse.json(
+        { error: "Forbidden: You do not have permission to download this document" },
+        { status: 403 }
+      );
+    }
+
     let pdfBuffer: Uint8Array | null = null;
 
     // 1. Try to download from InsForge Storage if storagePath exists

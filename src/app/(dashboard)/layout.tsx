@@ -15,7 +15,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { createClient } from "@/utils/insforge/client";
 import { signOutAction } from "@/server/actions/auth";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -32,16 +31,17 @@ export default function DashboardLayout({
   const [userInitials, setUserInitials] = useState<string>("U");
 
   useEffect(() => {
-    const insforge = createClient();
-    insforge.auth.getCurrentUser().then((res: any) => {
-      const user = res?.data?.user;
-      if (user?.email) {
-        setUserEmail(user.email);
-        // Derive initials from email prefix or name
-        const displayName = user.profile?.name || user.email.split("@")[0];
-        setUserInitials(displayName.slice(0, 2).toUpperCase());
-      }
-    });
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        const user = data?.user;
+        if (user?.email) {
+          setUserEmail(user.email);
+          const displayName = user.name || user.email.split("@")[0];
+          setUserInitials(displayName.slice(0, 2).toUpperCase());
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const handleSignOut = async () => {
@@ -92,7 +92,10 @@ export default function DashboardLayout({
               </Button>
 
               <DropdownMenu>
-                <DropdownMenuTrigger className={cn(buttonVariants({ variant: "ghost" }), "relative h-9 w-9 rounded-full p-0 border-0 shrink-0")}>
+                <DropdownMenuTrigger
+                  suppressHydrationWarning
+                  className={cn(buttonVariants({ variant: "ghost" }), "relative h-9 w-9 rounded-full p-0 border-0 shrink-0")}
+                >
                   <Avatar className="h-9 w-9 border border-border/50 shadow-soft hover:shadow-md transition-shadow">
                     <AvatarFallback className="bg-primary/10 text-primary">{userInitials}</AvatarFallback>
                   </Avatar>

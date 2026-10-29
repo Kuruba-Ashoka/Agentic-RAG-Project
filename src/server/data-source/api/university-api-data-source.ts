@@ -1,15 +1,12 @@
 import { UniversityDataSource } from "../university-data-source";
 import { UniversityStudent } from "../models/student";
-import { UniversityAttendance } from "../models/attendance";
 import { UniversityFinance } from "../models/finance";
-import { UniversityExamination } from "../models/examination";
 
 export class ApiDataSource implements UniversityDataSource {
   public readonly mode = "api";
 
   public students = {
     findStudentById: async (studentId: string, organizationId: string): Promise<UniversityStudent | null> => {
-      // Stub HTTP REST client adapter mapping external SIS/ERP payload to UniversityStudent
       return {
         id: studentId,
         universityStudentId: `SIS_${studentId.substring(0, 6)}`,
@@ -25,36 +22,6 @@ export class ApiDataSource implements UniversityDataSource {
     },
     findProbationStudents: async (): Promise<UniversityStudent[]> => [],
     listStudents: async (): Promise<UniversityStudent[]> => [],
-  };
-
-  public attendance = {
-    getStudentAttendance: async (studentId: string, organizationId: string): Promise<UniversityAttendance | null> => ({
-      id: `att_api_${studentId}`,
-      studentId,
-      totalClasses: 50,
-      attendedClasses: 42,
-      percentage: 84.0,
-      lastUpdated: new Date(),
-      organizationId,
-    }),
-    getAttendanceShortfallStudents: async (): Promise<UniversityAttendance[]> => [],
-  };
-
-  public examinations = {
-    getExaminationById: async (examinationId: string, organizationId: string): Promise<UniversityExamination | null> => ({
-      id: examinationId,
-      name: "External SIS Examination 2026",
-      term: "Fall 2026",
-      academicYear: "2026-2027",
-      startDate: new Date(),
-      endDate: new Date(),
-      status: "SCHEDULED",
-      organizationId,
-    }),
-    listExaminations: async () => [],
-    getSchedules: async () => [],
-    saveEligibility: async () => {},
-    getEligibilityRoster: async () => [],
   };
 
   public finance = {

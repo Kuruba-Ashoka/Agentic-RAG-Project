@@ -50,6 +50,54 @@ export async function GET(
 
     if (!doc) return NextResponse.json({ error: "Document not found" }, { status: 404 });
 
+    // Enforce DocumentAccessPolicy authorization
+    const { DocumentAccessPolicy } = await import("@/server/services/document-access-policy");
+    let accessContext: any;
+    if (isFaculty && facultyUser) {
+      accessContext = {
+        organizationId: facultyUser.organizationId || doc.organizationId,
+        userId: facultyUser.userId || facultyUser.id,
+        facultyId: facultyUser.id,
+        userRole: (facultyUser.role || "FACULTY").toUpperCase(),
+        departmentId: facultyUser.departmentId,
+        collegeId: facultyUser.collegeId,
+      };
+    } else if (user) {
+      const membership = await db.membership.findFirst({
+        where: { userId: user.id, organizationId: doc.organizationId, deletedAt: null },
+        select: { role: true },
+      });
+      const role = (membership?.role || "STUDENT").toUpperCase();
+
+      if (["OWNER", "ADMIN", "DEAN"].includes(role)) {
+        accessContext = {
+          organizationId: doc.organizationId,
+          userId: user.id,
+          userRole: role,
+        };
+      } else {
+        accessContext = await DocumentAccessPolicy.resolveStudentAccessContext(
+          user.id,
+          doc.organizationId
+        );
+      }
+    }
+
+    const hasAccess = DocumentAccessPolicy.canAccessDocument(accessContext, {
+      organizationId: doc.organizationId,
+      collegeId: doc.collegeId,
+      departmentId: doc.departmentId,
+      visibility: doc.visibility,
+      uploadedBy: doc.uploadedBy,
+    });
+
+    if (!hasAccess) {
+      return NextResponse.json(
+        { error: "Forbidden: You do not have permission to view this document" },
+        { status: 403 }
+      );
+    }
+
     // Build a signed URL for the storage object if storagePath exists
     let signedUrl: string | null = null;
     try {

@@ -10,6 +10,7 @@ import { AcademicPolicyCache } from "../ai/cag/academic-policy-cache";
 import { AcademicDecisionEngine } from "../ai/decision/academic-decision-engine";
 import { CognitiveKernel } from "../ai/kernel/cognitive-kernel";
 import { PolicyEngine } from "../ai/kernel/policy-engine";
+import { WorldStateManager } from "../ai/kernel/world-state-manager";
 import { RetrievalStrategySelector } from "../ai/knowledge/retrieval-strategy-selector";
 
 function assert(condition: boolean, message: string) {
@@ -107,12 +108,11 @@ async function runTests() {
   assert(kernelAudit.knowledgeRoute === "DETERMINISTIC_ACADEMIC_AUDIT", "Should route to DETERMINISTIC_ACADEMIC_AUDIT");
 
   // Policy Engine: Overload check (> 26 credits)
-  const overloadEval = PolicyEngine.evaluatePolicy("Student wants to enroll in 28 credits this semester", "CANONICAL", {
-    activeUserContext: { userId: "user-1", userRole: "STUDENT", department: "CSE" },
-    activeSessionId: "sess-1",
-    timestamp: new Date().toISOString(),
-    systemHealth: { databaseStatus: "HEALTHY", vectorDbStatus: "HEALTHY" },
-  });
+  const overloadEval = PolicyEngine.evaluatePolicy(
+    "Student wants to enroll in 28 credits this semester",
+    "CANONICAL",
+    WorldStateManager.getSnapshot("user-1", "STUDENT")
+  );
   assert(overloadEval.requiresApproval === true, "28 credits registration must require approval");
   assert(overloadEval.violatedPolicies.some((p) => p.includes("POL-004")), "Must trigger POL-004 Overload policy");
 

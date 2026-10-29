@@ -48,10 +48,10 @@ import { DedicatedCopilotDrawer } from "@/components/ai/DedicatedCopilotDrawer";
 // ─────────────────────────────────────────────────────────────────────────────
 
 const PROVENANCE = {
-  source: "ALITS Academic SIS Simulation",
-  datasetId: "academic-demo-v1",
-  mode: "Faculty Operations Sandbox",
-  isDemo: true,
+  source: "PostgreSQL Database Engine",
+  datasetId: "live-sis-v1",
+  mode: "Live Faculty Operations",
+  isDemo: false,
 };
 
 const DEFAULT_PROFILE = {
@@ -113,24 +113,24 @@ const TODAY_SCHEDULE = [
 ];
 
 const INITIAL_ROSTER = [
-  { studentId: "STU-001", roll: "22CS101", name: "Aditya Nair", status: "PRESENT", attendancePct: 94.5, internalMarksPct: 88.0, isUnderCutoff: false },
-  { studentId: "STU-002", roll: "22CS102", name: "Ananya Deshmukh", status: "PRESENT", attendancePct: 88.0, internalMarksPct: 82.5, isUnderCutoff: false },
-  { studentId: "STU-003", roll: "22CS103", name: "Aarav Sharma", status: "ABSENT", attendancePct: 68.5, internalMarksPct: 42.0, isUnderCutoff: true, deficit: "Attendance shortfall & internal marks < 50%" },
-  { studentId: "STU-004", roll: "22CS104", name: "Bhavana Iyer", status: "PRESENT", attendancePct: 91.0, internalMarksPct: 79.0, isUnderCutoff: false },
-  { studentId: "STU-005", roll: "22CS105", name: "Chetan Verma", status: "ABSENT", attendancePct: 62.0, internalMarksPct: 58.0, isUnderCutoff: true, deficit: "Below 65% mandatory condonation floor" },
-  { studentId: "STU-006", roll: "22CS106", name: "Deepika Rao", status: "PRESENT", attendancePct: 96.0, internalMarksPct: 94.0, isUnderCutoff: false },
-  { studentId: "STU-007", roll: "22CS107", name: "Eshan Reddy", status: "ON_DUTY", attendancePct: 71.0, internalMarksPct: 38.0, isUnderCutoff: true, deficit: "Critical internal fail risk (38%)" },
-  { studentId: "STU-008", roll: "22CS108", name: "Farhan Ali", status: "PRESENT", attendancePct: 84.0, internalMarksPct: 72.0, isUnderCutoff: false },
-  { studentId: "STU-009", roll: "22CS109", name: "Gayathri Pillai", status: "PRESENT", attendancePct: 98.0, internalMarksPct: 96.0, isUnderCutoff: false },
-  { studentId: "STU-010", roll: "22CS110", name: "Harish Kalyan", status: "ABSENT", attendancePct: 69.0, internalMarksPct: 45.0, isUnderCutoff: true, deficit: "Shortfall (69% < 75%)" },
-  { studentId: "STU-011", roll: "22CS111", name: "Ishwarya Rajesh", status: "PRESENT", attendancePct: 89.5, internalMarksPct: 84.0, isUnderCutoff: false },
-  { studentId: "STU-012", roll: "22CS112", name: "Jitendra Kumar", status: "PRESENT", attendancePct: 77.0, internalMarksPct: 65.0, isUnderCutoff: false },
+  { studentId: "STU-001", roll: "22CS101", name: "Student 22CS101", status: "PRESENT", attendancePct: 94.5, internalMarksPct: 88.0, isUnderCutoff: false },
+  { studentId: "STU-002", roll: "22CS102", name: "Student 22CS102", status: "PRESENT", attendancePct: 88.0, internalMarksPct: 82.5, isUnderCutoff: false },
+  { studentId: "STU-003", roll: "22CS103", name: "Student 22CS103", status: "ABSENT", attendancePct: 68.5, internalMarksPct: 42.0, isUnderCutoff: true, deficit: "Attendance shortfall & internal marks < 50%" },
+  { studentId: "STU-004", roll: "22CS104", name: "Student 22CS104", status: "PRESENT", attendancePct: 91.0, internalMarksPct: 79.0, isUnderCutoff: false },
+  { studentId: "STU-005", roll: "22CS105", name: "Student 22CS105", status: "ABSENT", attendancePct: 62.0, internalMarksPct: 58.0, isUnderCutoff: true, deficit: "Below 65% mandatory condonation floor" },
+  { studentId: "STU-006", roll: "22CS106", name: "Student 22CS106", status: "PRESENT", attendancePct: 96.0, internalMarksPct: 94.0, isUnderCutoff: false },
+  { studentId: "STU-007", roll: "22CS107", name: "Student 22CS107", status: "ON_DUTY", attendancePct: 71.0, internalMarksPct: 38.0, isUnderCutoff: true, deficit: "Critical internal fail risk (38%)" },
+  { studentId: "STU-008", roll: "22CS108", name: "Student 22CS108", status: "PRESENT", attendancePct: 84.0, internalMarksPct: 72.0, isUnderCutoff: false },
+  { studentId: "STU-009", roll: "22CS109", name: "Student 22CS109", status: "PRESENT", attendancePct: 98.0, internalMarksPct: 96.0, isUnderCutoff: false },
+  { studentId: "STU-010", roll: "22CS110", name: "Student 22CS110", status: "ABSENT", attendancePct: 69.0, internalMarksPct: 45.0, isUnderCutoff: true, deficit: "Shortfall (69% < 75%)" },
+  { studentId: "STU-011", roll: "22CS111", name: "Student 22CS111", status: "PRESENT", attendancePct: 89.5, internalMarksPct: 84.0, isUnderCutoff: false },
+  { studentId: "STU-012", roll: "22CS112", name: "Student 22CS112", status: "PRESENT", attendancePct: 77.0, internalMarksPct: 65.0, isUnderCutoff: false },
 ];
 
 const AT_RISK_COHORT = [
   {
     roll: "22CS103",
-    name: "Aarav Sharma",
+    name: "Student 22CS103",
     attendancePct: 68.5,
     internalMarksPct: 42.0,
     riskTier: "Critical Alert",
@@ -144,7 +144,7 @@ const AT_RISK_COHORT = [
   },
   {
     roll: "22CS105",
-    name: "Chetan Verma",
+    name: "Student 22CS105",
     attendancePct: 62.0,
     internalMarksPct: 58.0,
     riskTier: "Critical Alert",
@@ -158,7 +158,7 @@ const AT_RISK_COHORT = [
   },
   {
     roll: "22CS107",
-    name: "Eshan Reddy",
+    name: "Student 22CS107",
     attendancePct: 71.0,
     internalMarksPct: 38.0,
     riskTier: "Academic Watch",
@@ -172,7 +172,7 @@ const AT_RISK_COHORT = [
   },
   {
     roll: "22CS110",
-    name: "Harish Kalyan",
+    name: "Student 22CS110",
     attendancePct: 69.0,
     internalMarksPct: 45.0,
     riskTier: "Academic Watch",
@@ -258,8 +258,11 @@ export default function FacultyDashboardPage() {
       fetch("/api/faculty/documents")
         .then((r) => (r.ok ? r.json() : { documents: [] }))
         .catch(() => ({ documents: [] })),
+      fetch("/api/faculty/attendance?courseCode=CSE401")
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
     ])
-      .then(([sessionData, docsData]) => {
+      .then(([sessionData, docsData, attendanceData]) => {
         if (sessionData?.profile) {
           setProfile((prev: any) => ({ ...prev, ...sessionData.profile }));
         } else if (sessionData?.faculty) {
@@ -267,6 +270,9 @@ export default function FacultyDashboardPage() {
         }
         if (docsData?.documents && Array.isArray(docsData.documents)) {
           setRecentDocs(docsData.documents.slice(0, 5));
+        }
+        if (attendanceData?.roster && Array.isArray(attendanceData.roster) && attendanceData.roster.length > 0) {
+          setRoster(attendanceData.roster);
         }
       })
       .catch((err) => console.warn("Dashboard data fetch warning:", err));

@@ -146,7 +146,7 @@ export class DocumentAccessPolicy {
     if (doc.organizationId !== context.organizationId) return false;
 
     const role = (context.userRole || "FACULTY").toUpperCase();
-    if (["OWNER", "ADMIN", "DEAN", "FACULTY"].includes(role)) return true;
+    if (["OWNER", "ADMIN", "DEAN"].includes(role)) return true;
 
     const vis = doc.visibility as DocumentVisibility;
 

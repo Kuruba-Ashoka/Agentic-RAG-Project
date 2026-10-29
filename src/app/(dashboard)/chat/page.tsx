@@ -31,7 +31,6 @@ import {
   Scale,
   X,
 } from "lucide-react";
-import { createClient } from "@/utils/insforge/client";
 import {
   Sheet,
   SheetTrigger,
@@ -607,14 +606,16 @@ export default function ChatPage() {
 
   // Load user info
   useEffect(() => {
-    const insforge = createClient();
-    insforge.auth.getCurrentUser().then((res: any) => {
-      const user = res?.data?.user;
-      if (!user) return;
-      const name = user.profile?.name ?? user.email?.split("@")[0] ?? "Student";
-      setUserName(name);
-      setUserInitials(name.slice(0, 2).toUpperCase());
-    });
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        const user = data?.user;
+        if (!user) return;
+        const name = user.name || user.email?.split("@")[0] || "Student";
+        setUserName(name);
+        setUserInitials(name.slice(0, 2).toUpperCase());
+      })
+      .catch(() => {});
   }, []);
 
   // Load history

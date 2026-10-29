@@ -1,9 +1,10 @@
 import { db } from "@/server/db/prisma";
 import { UniversityDataSource } from "../university-data-source";
 import { UniversityStudent, StudentAcademicStatus } from "../models/student";
-import { UniversityAttendance } from "../models/attendance";
 import { UniversityFinance } from "../models/finance";
-import { UniversityExamination, UniversityEligibilityRecord } from "../models/examination";
+import { UniversityFaculty } from "../models/faculty";
+import { UniversityCourse, UniversityCourseSection } from "../models/course";
+import { UniversityResult } from "../models/result";
 
 export class PostgresDataSource implements UniversityDataSource {
   public readonly mode = "postgres";
@@ -11,7 +12,11 @@ export class PostgresDataSource implements UniversityDataSource {
   public students = {
     findStudentById: async (studentId: string, organizationId: string): Promise<UniversityStudent | null> => {
       const student = await db.student.findFirst({
-        where: { id: studentId, organizationId, deletedAt: null },
+        where: {
+          organizationId,
+          deletedAt: null,
+          OR: [{ id: studentId }, { studentNumber: studentId }],
+        },
         include: { user: true, department: true },
       });
 
@@ -24,7 +29,7 @@ export class PostgresDataSource implements UniversityDataSource {
       return {
         id: student.id,
         universityStudentId: student.studentNumber,
-        name: student.user?.name || "Student",
+        name: student.user?.name || `Student ${student.studentNumber}`,
         email: student.user?.email || "",
         departmentId: student.departmentId,
         departmentCode: student.department?.code || "GEN",
@@ -49,7 +54,7 @@ export class PostgresDataSource implements UniversityDataSource {
       return list.map((student) => ({
         id: student.id,
         universityStudentId: student.studentNumber,
-        name: student.user?.name || "Student",
+        name: student.user?.name || `Student ${student.studentNumber}`,
         email: student.user?.email || "",
         departmentId: student.departmentId,
         departmentCode: student.department?.code || "GEN",
@@ -61,112 +66,39 @@ export class PostgresDataSource implements UniversityDataSource {
       }));
     },
 
-    listStudents: async (organizationId: string): Promise<UniversityStudent[]> => {
+    listStudents: async (organizationId: string, departmentCode?: string): Promise<UniversityStudent[]> => {
       const list = await db.student.findMany({
-        where: { organizationId, deletedAt: null },
+        where: {
+          organizationId,
+          deletedAt: null,
+          ...(departmentCode ? { department: { code: departmentCode } } : {}),
+        },
         include: { user: true, department: true },
       });
 
       return list.map((student) => ({
         id: student.id,
         universityStudentId: student.studentNumber,
-        name: student.user?.name || "Student",
+        name: student.user?.name || `Student ${student.studentNumber}`,
         email: student.user?.email || "",
         departmentId: student.departmentId,
         departmentCode: student.department?.code || "GEN",
         major: student.major,
         gpa: student.gpa,
-        academicStatus: "GOOD_STANDING" as StudentAcademicStatus,
+        academicStatus: (student.academicStatus === "Academic Probation" ? "PROBATION" : "GOOD_STANDING") as StudentAcademicStatus,
         advisorId: student.advisorId || undefined,
         organizationId: student.organizationId,
       }));
     },
   };
 
-  public attendance = {
-    getStudentAttendance: async (studentId: string, organizationId: string): Promise<UniversityAttendance | null> => {
-      const rec = await db.attendanceRecord.findFirst({
-        where: { studentId, organizationId },
-      });
-
-      if (!rec) return null;
-
-      return {
-        id: rec.id,
-        studentId: rec.studentId,
-        courseSectionId: rec.courseSectionId || undefined,
-        totalClasses: rec.totalClasses,
-        attendedClasses: rec.attendedClasses,
-        percentage: rec.percentage,
-        lastUpdated: rec.lastUpdated,
-        organizationId: rec.organizationId,
-      };
-    },
-
-    getAttendanceShortfallStudents: async (organizationId: string, thresholdPercentage: number): Promise<UniversityAttendance[]> => {
-      const records = await db.attendanceRecord.findMany({
-        where: { organizationId, percentage: { lt: thresholdPercentage } },
-      });
-
-      return records.map((rec) => ({
-        id: rec.id,
-        studentId: rec.studentId,
-        courseSectionId: rec.courseSectionId || undefined,
-        totalClasses: rec.totalClasses,
-        attendedClasses: rec.attendedClasses,
-        percentage: rec.percentage,
-        lastUpdated: rec.lastUpdated,
-        organizationId: rec.organizationId,
-      }));
-    },
-  };
-
-  public examinations = {
-    getExaminationById: async (examinationId: string, organizationId: string): Promise<UniversityExamination | null> => {
-      const exam = await db.examination.findFirst({
-        where: { id: examinationId, organizationId, deletedAt: null },
-      });
-
-      if (!exam) return null;
-
-      return {
-        id: exam.id,
-        name: exam.name,
-        term: exam.term,
-        academicYear: exam.academicYear,
-        startDate: exam.startDate,
-        endDate: exam.endDate,
-        status: exam.status,
-        organizationId: exam.organizationId,
-      };
-    },
-
-    listExaminations: async (organizationId: string): Promise<UniversityExamination[]> => {
-      const exams = await db.examination.findMany({
-        where: { organizationId, deletedAt: null },
-      });
-
-      return exams.map((exam) => ({
-        id: exam.id,
-        name: exam.name,
-        term: exam.term,
-        academicYear: exam.academicYear,
-        startDate: exam.startDate,
-        endDate: exam.endDate,
-        status: exam.status,
-        organizationId: exam.organizationId,
-      }));
-    },
-
-    getSchedules: async () => [],
-    saveEligibility: async () => {},
-    getEligibilityRoster: async (): Promise<UniversityEligibilityRecord[]> => [],
-  };
-
   public finance = {
     getStudentBalance: async (studentId: string, organizationId: string): Promise<UniversityFinance | null> => {
       const fin = await db.financialAccount.findFirst({
-        where: { studentId, organizationId },
+        where: {
+          organizationId,
+          OR: [{ studentId }, { student: { studentNumber: studentId } }],
+        },
       });
 
       if (!fin) return null;
@@ -205,15 +137,88 @@ export class PostgresDataSource implements UniversityDataSource {
   };
 
   public faculty = {
-    listFaculty: async () => [],
+    listFaculty: async (organizationId: string, departmentCode?: string): Promise<UniversityFaculty[]> => {
+      const list = await db.faculty.findMany({
+        where: {
+          organizationId,
+          deletedAt: null,
+          ...(departmentCode ? { department: { code: departmentCode } } : {}),
+        },
+        include: { user: true, department: true },
+      });
+
+      return list.map((f) => ({
+        id: f.id,
+        name: f.user?.name || f.facultyCode || "Faculty Member",
+        email: f.user?.email || "",
+        departmentId: f.departmentId,
+        departmentCode: f.department?.code || "GEN",
+        title: f.title || "Faculty",
+        officeRoom: f.officeRoom || undefined,
+        organizationId: f.organizationId,
+      }));
+    },
   };
 
   public courses = {
-    listCourses: async () => [],
-    getCourseSections: async () => [],
+    listCourses: async (organizationId: string, departmentCode?: string): Promise<UniversityCourse[]> => {
+      const list = await db.course.findMany({
+        where: {
+          organizationId,
+          deletedAt: null,
+          ...(departmentCode ? { department: { code: departmentCode } } : {}),
+        },
+        include: { department: true },
+      });
+
+      return list.map((c) => ({
+        id: c.id,
+        code: c.code,
+        title: c.title,
+        credits: c.credits,
+        departmentId: c.departmentId,
+        departmentCode: c.department?.code || "GEN",
+        organizationId: c.organizationId,
+      }));
+    },
+
+    getCourseSections: async (organizationId: string): Promise<UniversityCourseSection[]> => {
+      const list = await db.courseSection.findMany({
+        where: { organizationId, deletedAt: null },
+      });
+
+      return list.map((cs) => ({
+        id: cs.id,
+        courseId: cs.courseId,
+        sectionCode: cs.sectionCode,
+        term: cs.term,
+        facultyId: cs.facultyId || undefined,
+        room: cs.room || undefined,
+        capacity: cs.capacity,
+        organizationId: cs.organizationId,
+      }));
+    },
   };
 
   public results = {
-    getStudentResults: async () => [],
+    getStudentResults: async (studentId: string, organizationId: string): Promise<UniversityResult[]> => {
+      const list = await db.semesterResult.findMany({
+        where: {
+          organizationId,
+          OR: [{ studentId }, { student: { studentNumber: studentId } }],
+        },
+      });
+
+      return list.map((r) => ({
+        id: r.id,
+        studentId: r.studentId,
+        term: r.term,
+        sgpa: r.sgpa,
+        cgpa: r.cgpa,
+        backlogsCount: r.backlogsCount,
+        totalCredits: r.totalCredits,
+        organizationId: r.organizationId,
+      }));
+    },
   };
 }

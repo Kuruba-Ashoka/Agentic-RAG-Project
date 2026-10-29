@@ -45,14 +45,14 @@ export async function databaseAgent(state: typeof GraphState.State) {
 
     // a) Exam eligibility detection
     if (/\b(exam|eligib|ineligib|hall ticket|exam registration)\b/i.test(queryText)) {
-      const ineligibleStudents = await StudentOperationsService.getExamIneligibleStudents(organizationId);
+      const ineligibleStudents = await StudentOperationsService.getAllProbationStudents(organizationId);
       recordsPayload.push({
-        toolName: "ExamEligibilityQuery",
+        toolName: "ProbationStudentsQuery",
         records: ineligibleStudents.map((s: any) => ({
           studentId: s.studentId || s.id || s.studentNumber,
           name: s.name || s.user?.name,
-          blockingReasons: s.blockingReasons,
-          recommendations: s.recommendations,
+          academicStatus: (s as any).academicStatus,
+
         })),
       });
       queryMatched = true;

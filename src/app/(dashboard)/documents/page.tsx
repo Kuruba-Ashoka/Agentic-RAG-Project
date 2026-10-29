@@ -598,7 +598,7 @@ export default function DocumentsPage() {
               {Array.from({ length: Math.min(pagination.pages, 5) }, (_, i) => {
                 const p = i + 1;
                 return (
-                  <button key={p} onClick={() => load(p)}
+                  <button key={p} onClick={() => load(p)} suppressHydrationWarning
                     className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${pagination.page === p ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-2xs" : "text-slate-600 hover:bg-slate-200 hover:text-slate-900"}`}>
                     {p}
                   </button>
@@ -606,7 +606,7 @@ export default function DocumentsPage() {
               })}
               {pagination.pages > 5 && <span className="text-slate-400 px-1 font-bold">...</span>}
               {pagination.pages > 5 && (
-                <button onClick={() => load(pagination.pages)}
+                <button onClick={() => load(pagination.pages)} suppressHydrationWarning
                   className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${pagination.page === pagination.pages ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-2xs" : "text-slate-600 hover:bg-slate-200 hover:text-slate-900"}`}>
                   {pagination.pages}
                 </button>

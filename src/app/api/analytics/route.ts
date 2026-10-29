@@ -3,73 +3,8 @@ import { createClient } from "@/utils/insforge/server";
 import { db } from "@/server/db/prisma";
 import { syncUserToDatabase } from "@/server/actions/auth";
 import { UsageType } from "@prisma/client";
-import { v4 as uuidv4 } from "uuid";
 
 export const dynamic = "force-dynamic";
-
-// Helper to seed initial historical data if an organization has < 5 events
-async function seedHistoricalData(organizationId: string) {
-  console.log(`[Analytics] Initializing usage events for organization: ${organizationId}`);
-  const now = new Date();
-  const events = [];
-
-  const models = ["gpt-4o-mini", "gemini-2.5-flash", "claude-3-5-sonnet", "text-embedding-3-small"];
-
-  for (let i = 29; i >= 0; i--) {
-    const dayDate = new Date(now);
-    dayDate.setDate(dayDate.getDate() - i);
-
-    const dailyCount = Math.floor(Math.random() * 8) + 3;
-
-    for (let j = 0; j < dailyCount; j++) {
-      const eventDate = new Date(dayDate);
-      eventDate.setHours(
-        Math.floor(Math.random() * 24),
-        Math.floor(Math.random() * 60),
-        Math.floor(Math.random() * 60)
-      );
-
-      const rand = Math.random();
-      let type: UsageType = UsageType.CHAT;
-      if (rand < 0.4) type = UsageType.CHAT;
-      else if (rand < 0.65) type = UsageType.RETRIEVAL;
-      else if (rand < 0.85) type = UsageType.EMBEDDING;
-      else type = UsageType.AGENT_EXECUTION;
-
-      const model = type === UsageType.EMBEDDING ? models[3] : models[Math.floor(Math.random() * 3)];
-      const latencyMs = Math.floor(Math.random() * 70) + (type === UsageType.AGENT_EXECUTION ? 110 : 45);
-
-      const tokensInput = type === UsageType.EMBEDDING ? Math.floor(Math.random() * 500) + 50 : Math.floor(Math.random() * 800) + 100;
-      const tokensOutput = type === UsageType.CHAT ? Math.floor(Math.random() * 1000) + 80 : 0;
-
-      let estimatedCost = 0;
-      if (type === UsageType.CHAT) {
-        estimatedCost = (tokensInput * 0.00000015) + (tokensOutput * 0.0000006);
-      } else if (type === UsageType.EMBEDDING) {
-        estimatedCost = tokensInput * 0.00000002;
-      } else {
-        estimatedCost = 0.0001;
-      }
-
-      events.push({
-        id: uuidv4(),
-        organizationId,
-        type,
-        model,
-        tokensInput,
-        tokensOutput,
-        embeddingTokens: type === UsageType.EMBEDDING ? tokensInput : null,
-        latencyMs,
-        estimatedCost,
-        createdAt: eventDate,
-      });
-    }
-  }
-
-  await db.usageEvent.createMany({
-    data: events,
-  });
-}
 
 export async function GET(req: Request) {
   try {
@@ -102,12 +37,6 @@ export async function GET(req: Request) {
     // Read requested days filter (default 30 days)
     const { searchParams } = new URL(req.url);
     const daysParam = Math.min(Math.max(parseInt(searchParams.get("days") || "30", 10), 1), 90);
-
-    // Auto-seed historical events if org has almost no usage events
-    const totalEventCount = await db.usageEvent.count({ where: { organizationId } });
-    if (totalEventCount < 5) {
-      await seedHistoricalData(organizationId);
-    }
 
     const now = new Date();
     const periodStart = new Date(now.getTime() - daysParam * 24 * 60 * 60 * 1000);

@@ -20,7 +20,6 @@ export class StudentOperationsService {
           advisor: {
             include: { user: true },
           },
-          attendanceRecords: true,
           internalMarks: true,
           semesterResults: {
             orderBy: { createdAt: "desc" },
@@ -58,7 +57,6 @@ export class StudentOperationsService {
         include: {
           user: true,
           department: true,
-          attendanceRecords: true,
           scholarshipRecord: true,
           semesterResults: {
             orderBy: { createdAt: "desc" },
@@ -69,24 +67,6 @@ export class StudentOperationsService {
       console.error("[StudentOperationsService] Error fetching probation students:", error);
       return [];
     }
-  }
-
-  /**
-   * Evaluates students with active suspension or financial holds (attendance checks removed).
-   */
-  public static async getExamIneligibleStudents(organizationId: string) {
-    const students = await db.student.findMany({
-      where: { organizationId, deletedAt: null },
-      include: {
-        user: true,
-        department: true,
-        financialAccounts: true,
-        semesterResults: { orderBy: { createdAt: "desc" } },
-      },
-    });
-
-    const { ExamEligibilityEngine } = await import("@/ai/decision/exam-eligibility-engine");
-    return ExamEligibilityEngine.getIneligibleStudents(students);
   }
 
   /**
@@ -130,7 +110,6 @@ export class StudentOperationsService {
       include: {
         user: true,
         department: true,
-        attendanceRecords: true,
         internalMarks: true,
         semesterResults: { orderBy: { createdAt: "desc" } },
         financialAccounts: true,
