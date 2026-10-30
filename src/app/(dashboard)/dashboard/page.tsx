@@ -294,6 +294,14 @@ export default function DashboardPage() {
               </Link>
 
               <Link
+                href="/research"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600/90 to-indigo-600/90 hover:from-purple-600 hover:to-indigo-600 text-white rounded-2xl text-xs font-bold px-4 py-3 transition-all shadow-md hover:shadow-purple-500/25 active:scale-95 border border-purple-400/30"
+              >
+                <Sparkles className="w-4 h-4 text-purple-200" />
+                <span>Research Workspace</span>
+              </Link>
+
+              <Link
                 href="/chat"
                 className="inline-flex items-center gap-2 bg-slate-800/80 hover:bg-slate-800 text-slate-200 hover:text-white rounded-2xl text-xs font-bold px-4 py-3 transition-all border border-slate-700/80 hover:border-indigo-400/50 shadow-md active:scale-95"
               >

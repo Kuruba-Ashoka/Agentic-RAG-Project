@@ -64,6 +64,7 @@ const navSections: NavSection[] = [
       { title: "Campus Home", url: "/", icon: Home },
       { title: "Student Dashboard", url: "/dashboard", icon: LayoutDashboard },
       { title: "AI Academic Copilot", url: "/chat", icon: MessageSquare },
+      { title: "Research Workspace", url: "/research", icon: BookMarked, badge: "Gemini" },
       { title: "Course Notes & Syllabi", url: "/documents", icon: BookOpen },
       { title: "Knowledge Bases", url: "/knowledge-bases", icon: FileText },
     ],

@@ -2,15 +2,14 @@
 
 import * as React from "react";
 import {
-  Calculator,
-  Calendar,
-  CreditCard,
   Settings,
-  Smile,
-  User,
   LayoutDashboard,
   BookOpen,
-  Bot
+  Bot,
+  BookMarked,
+  FileText,
+  BarChart2,
+  FlaskConical,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -43,40 +42,49 @@ export function CommandMenu() {
   const runCommand = React.useCallback((command: () => void) => {
     setOpen(false);
     command();
-  }, [router]);
+  }, []);
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
-        <CommandGroup heading="Navigation">
+        <CommandGroup heading="Student Academic Hub">
           <CommandItem onSelect={() => runCommand(() => router.push("/dashboard"))}>
             <LayoutDashboard className="mr-2 h-4 w-4" />
-            <span>Dashboard</span>
+            <span>Student Dashboard</span>
           </CommandItem>
-          <CommandItem onSelect={() => runCommand(() => router.push("/knowledge-bases"))}>
-            <BookOpen className="mr-2 h-4 w-4" />
-            <span>Knowledge Bases</span>
+          <CommandItem onSelect={() => runCommand(() => router.push("/research"))}>
+            <BookMarked className="mr-2 h-4 w-4 text-indigo-500" />
+            <span>Research Workspace</span>
           </CommandItem>
           <CommandItem onSelect={() => runCommand(() => router.push("/chat"))}>
+            <Bot className="mr-2 h-4 w-4 text-indigo-500" />
+            <span>AI Academic Copilot</span>
+          </CommandItem>
+          <CommandItem onSelect={() => runCommand(() => router.push("/documents"))}>
+            <BookOpen className="mr-2 h-4 w-4" />
+            <span>Course Notes & Syllabi</span>
+          </CommandItem>
+          <CommandItem onSelect={() => runCommand(() => router.push("/knowledge-bases"))}>
+            <FileText className="mr-2 h-4 w-4" />
+            <span>Knowledge Bases</span>
+          </CommandItem>
+        </CommandGroup>
+        <CommandSeparator />
+        <CommandGroup heading="Administration & Tools">
+          <CommandItem onSelect={() => runCommand(() => router.push("/analytics"))}>
+            <BarChart2 className="mr-2 h-4 w-4" />
+            <span>Operational Analytics</span>
+          </CommandItem>
+          <CommandItem onSelect={() => runCommand(() => router.push("/agents"))}>
             <Bot className="mr-2 h-4 w-4" />
-            <span>AI Chat</span>
+            <span>Autonomous Agents</span>
           </CommandItem>
-        </CommandGroup>
-        <CommandSeparator />
-        <CommandGroup heading="Student & Career">
-          <CommandItem onSelect={() => runCommand(() => router.push("/placement"))}>
-            <CreditCard className="mr-2 h-4 w-4" />
-            <span>Placement & Career Hub</span>
+          <CommandItem onSelect={() => runCommand(() => router.push("/evaluation"))}>
+            <FlaskConical className="mr-2 h-4 w-4" />
+            <span>RAG Quality Evaluation</span>
           </CommandItem>
-          <CommandItem onSelect={() => runCommand(() => router.push("/student/profile"))}>
-            <LayoutDashboard className="mr-2 h-4 w-4" />
-            <span>Student Profile</span>
-          </CommandItem>
-        </CommandGroup>
-        <CommandSeparator />
-        <CommandGroup heading="Settings">
           <CommandItem onSelect={() => runCommand(() => router.push("/settings"))}>
             <Settings className="mr-2 h-4 w-4" />
             <span>Settings</span>

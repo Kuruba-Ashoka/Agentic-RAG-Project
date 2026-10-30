@@ -5,6 +5,7 @@ import { AnimatedBackground } from "@/components/animated-background";
 import * as React from "react";
 import Link from "next/link";
 import {
+  BookMarked,
   Sparkles,
   MessageSquare,
   Landmark,
@@ -330,11 +331,11 @@ export default function HomePage() {
           <div className="flex items-center gap-2 shrink-0">
             {/* Wide Screen Subsystem Quick Jumps */}
             <Link
-              href="/placement"
-              className="hidden 2xl:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-cyan-50 hover:bg-cyan-100 dark:bg-cyan-950/40 dark:hover:bg-cyan-900/50 text-cyan-900 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-800 shadow-xs transition-all"
+              href="/research"
+              className="hidden 2xl:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/50 text-indigo-900 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800 shadow-xs transition-all"
             >
-              <Briefcase className="w-3.5 h-3.5 text-cyan-700 dark:text-cyan-400" />
-              <span>Placement</span>
+              <BookMarked className="w-3.5 h-3.5 text-indigo-700 dark:text-indigo-400" />
+              <span>Research</span>
             </Link>
 
             <Link
@@ -417,20 +418,20 @@ export default function HomePage() {
                 </Link>
 
                 <Link
-                  href="/placement"
+                  href="/research"
                   onClick={() => setMobileNavOpen(false)}
-                  className="flex items-center justify-between p-2.5 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800 hover:bg-cyan-100 dark:hover:bg-cyan-900/50 transition-colors"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-colors"
                 >
                   <div className="flex items-center gap-2.5">
-                    <div className="p-1.5 bg-cyan-600 text-white rounded-lg">
-                      <Briefcase className="w-4 h-4" />
+                    <div className="p-1.5 bg-purple-600 text-white rounded-lg">
+                      <BookMarked className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-slate-900 dark:text-white">Placement Portal</p>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400">Campus Drives, ATS & Mock Viva</p>
+                      <p className="text-xs font-bold text-slate-900 dark:text-white">Research Workspace</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400">Gemini 2.5 Multi-Doc & Telugu Synthesis</p>
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-cyan-400" />
+                  <ChevronRight className="w-4 h-4 text-purple-400" />
                 </Link>
 
                 <Link
@@ -644,51 +645,51 @@ export default function HomePage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-              {/* 1. Placement Center */}
-              <div className="p-6 rounded-2xl bg-white border border-emerald-200 shadow-md hover:shadow-xl hover:border-emerald-400 transition-all flex flex-col justify-between text-left group">
+              {/* 1. Research Workspace */}
+              <div className="p-6 rounded-2xl bg-white border border-purple-200 shadow-md hover:shadow-xl hover:border-purple-400 transition-all flex flex-col justify-between text-left group">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <div className="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
-                      <Sparkles className="w-6 h-6 text-emerald-700" />
+                    <div className="w-11 h-11 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center font-bold">
+                      <BookMarked className="w-6 h-6 text-purple-700" />
                     </div>
-                    <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
-                      Career Competency
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full bg-purple-100 text-purple-800 border border-purple-300">
+                      Gemini 2.5 Flash
                     </span>
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-slate-900 group-hover:text-emerald-700 transition-colors">
-                      Placement Center
+                    <h3 className="text-lg font-black text-slate-900 group-hover:text-purple-700 transition-colors">
+                      Research Workspace
                     </h3>
-                    <p className="text-xs font-medium text-emerald-800">Career Competency Accelerator</p>
+                    <p className="text-xs font-medium text-purple-800">Multi-Document Synthesis & Telugu TTS</p>
                   </div>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Industry readiness, skill evaluation benchmarks, and career placement engine.
+                    Cross-document synthesis with 1M-token context, 8 academic modes, and bilingual Telugu speech audio.
                   </p>
                   <ul className="space-y-1.5 pt-2 border-t border-slate-100 text-xs text-slate-700">
                     <li className="flex items-start gap-1.5">
-                      <span className="text-emerald-600 font-bold">✓</span>
-                      <span>6 Industry Career Tracks (GenAI, Cloud, Cyber...)</span>
+                      <span className="text-purple-600 font-bold">✓</span>
+                      <span>8 Synthesis Modes: Literature Matrix, Viva Sim...</span>
                     </li>
                     <li className="flex items-start gap-1.5">
-                      <span className="text-emerald-600 font-bold">✓</span>
-                      <span>Interactive Assessment Arena & Coding challenges</span>
+                      <span className="text-purple-600 font-bold">✓</span>
+                      <span>Native Telugu (తెలుగు) & English Audio Synthesis</span>
                     </li>
                     <li className="flex items-start gap-1.5">
-                      <span className="text-emerald-600 font-bold">✓</span>
-                      <span>Live 6-Axis Skills Radar visualization</span>
+                      <span className="text-purple-600 font-bold">✓</span>
+                      <span>Curated Workspaces (Agentic RAG, RISC-V, Drones)</span>
                     </li>
                     <li className="flex items-start gap-1.5">
-                      <span className="text-emerald-600 font-bold">✓</span>
-                      <span>Verified Industry Certifications & Dossier</span>
+                      <span className="text-purple-600 font-bold">✓</span>
+                      <span>Formal Math (KaTeX) & BibTeX/IEEE Citations</span>
                     </li>
                   </ul>
                 </div>
                 <div className="pt-5 mt-4 border-t border-slate-100">
                   <Link
-                    href="/skills"
-                    className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-all"
+                    href="/research"
+                    className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white shadow-sm transition-all"
                   >
-                    <span>Enter Placement Center</span>
+                    <span>Enter Research Workspace</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
